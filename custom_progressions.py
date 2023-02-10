@@ -8,6 +8,7 @@ half_steps = {
     "V": 7,
     "VI": 9, 
     "VII": 11,
+    "i": 0,
     "ii": 2, 
     "iii": 4, 
     "vi": 9, 
@@ -49,7 +50,7 @@ def main():
     
         moves = half_steps.get(prog) # Determine how many half-steps to move up the scale.
         m = notes[moves]
-        if prog == "ii" or prog == "iii" or prog == "vi" or prog == "vii": # Add minor notation to minor intervals.
+        if prog == "i" or prog == "ii" or prog == "iii" or prog == "vi" or prog == "vii": # Add minor notation to minor intervals.
             m = m + "m"
         progression.append(m)
 
