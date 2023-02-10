@@ -11,6 +11,8 @@ half_steps = {
     "i": 0,
     "ii": 2, 
     "iii": 4, 
+    "iv": 5,
+    "v": 7,
     "vi": 9, 
     "vii": 11
 }
@@ -29,8 +31,7 @@ def main():
     print()
     
     chosen_key = notes[notes_index] # Assign the value.
-    index = 0;
-    while notes[index] != chosen_key: # Re-order the notes starting at chosen key.
+    while notes[0] != chosen_key: # Re-order the notes starting at chosen key.
         notes.append(notes.pop(0))
 
     more = True
@@ -50,7 +51,7 @@ def main():
     
         moves = half_steps.get(prog) # Determine how many half-steps to move up the scale.
         m = notes[moves]
-        if prog == "i" or prog == "ii" or prog == "iii" or prog == "vi" or prog == "vii": # Add minor notation to minor intervals.
+        if prog == "i" or prog == "ii" or prog == "iii" or prog == "iv" or prog == "v" or prog == "vi" or prog == "vii": # Add minor notation to minor intervals.
             m = m + "m"
         progression.append(m)
 
