@@ -69,9 +69,86 @@ class musictools:
                         "G": ["Gm", "Adim", "Bb", "Cm", "Dm", "Eb", "F"],
                         "G#": ["G#m", "A#dim", "B", "C#m", "D#m", "E", "F#"]}
 
-    def get_chords_for_progression(self, chosen_key=None, chosen_progression=None):
-        """The user will first choose a progression and then a key.
+    def get_progression(self, chosen_key=None, intervals=None):
+        """
+        Provides the chord progression given a key and intervals.
+        :param chosen_key: The musical key
+        :param intervals: The progression intervals
+        :return: The chords of the progress
+        """
+        key_scale = []
+        progression = []
+        for n in self.notes:
+            key_scale.append(n)
+
+        while key_scale[0] != chosen_key:
+            key_scale.append(key_scale.pop(0))
+
+        for interval in intervals:
+            moves = self.half_steps.get(interval)  # Determine how many half-steps to move up the scale.
+            m = key_scale[moves]
+            if interval == "i" or interval == "ii" or interval == "iii" or interval == "iv" or interval == "v" or interval == "vi" or interval == "vii":  # Add minor notation to minor intervals.
+                m = m + "m"
+            progression.append(m)
+
+        return progression
+
+    def get_note_from_scale(self):
+        print("Select a key:")
+        cs_options = []
+        for cs in self.chromatic_scale:
+            cs_options.append(cs)
+        cs_menu = TerminalMenu(cs_options)
+        cs_index = cs_menu.show()
+        note = cs_options[cs_index]
+
+        return note
+
+    def get_chord_type(self):
+        print("Select a chord type:")
+        ct_options = []
+        for ct in self.chord_types:
+            ct_options.append(ct)
+        ct_menu = TerminalMenu(ct_options)
+        ct_index = ct_menu.show()
+        chord_t = ct_options[ct_index]
+
+        return chord_t
+
+    def output_notes_in_a_chord(self):
+        """
+        The user selects a chord & the chords type and we output the notes contained for it
+        """
+        note = self.get_note_from_scale()
+        chord_t = self.get_chord_type()
+        chord = note + chord_t
+        # Parse the chord string to extract the root note and chord type
+        root_note = chord[0]
+        chord_type = chord[1:]
+
+        # Determine the intervals for the chord type
+        if chord_type not in self.chord_types:
+            print(f"Invalid chord type: {chord_type}")
+            print("Choose another chord type:")
+            self.output_notes_in_a_chord()
+        intervals = self.chord_types[chord_type]
+
+        # Calculate the notes in the chord
+        chord_notes = [self.chromatic_scale[(self.chromatic_scale.index(root_note) + interval) % 12] for interval in
+                       intervals]
+
+        # Print the notes in the chord
+        print(f"The notes in {chord} chord are: {', '.join(chord_notes)}")
+        print("")
+        self.run()
+
+    def output_chords_for_progression(self, chosen_key=None, chosen_progression=None):
+        """
+        The user will first choose a progression and then a key.
         We output the associated chords in that progression for that key.
+        :param chosen_key: The musical key
+        :param chosen_progression: The progression intervals
+        :return:
         """
         chords = []
         if chosen_progression == None:
@@ -82,25 +159,13 @@ class musictools:
                 progression_options.append(progression)
             progression_menu = TerminalMenu(progression_options) # Create the menu.
             choice_index = progression_menu.show()
-            #print("Progression: " + str(progression_options[choice_index]))
-            #print()
             chosen_progression = progression_options[choice_index] # Assign the value.
 
         if chosen_key == None:
             # Prompt user to choose a key (We use the same process as above to create menu.)
-            key_options = []
-            print("Choose a key:")
-            for key in self.chromatic_scale:
-                key_options.append(key)
-            key_menu = TerminalMenu(key_options)
-            key_index = key_menu.show()
-            print("Key: " + str(key_options[key_index]))
+            chosen_key = self.get_note_from_scale()
+            print("Key: " + str(chosen_key))
             print()
-            chosen_key = key_options[key_index]
-
-            # Output the chords for the chosen progression and output our desired chords.
-            #for chord in self.chord_progressions[chosen_progression][chosen_key.upper()]:
-            #   chords.append(chord)
 
         print(chosen_progression)
         
@@ -119,20 +184,15 @@ class musictools:
 
     def create_custom_progression(self, chosen_key=None, intervals=None):
         """
-        The user chooses a key then chooses intervals 
-        for a custom progression.
+        Has ability to interface and outputs the chord progression given a key and intervals.
+        :param chosen_key: The musical key
+        :param intervals: The progression intervals
         """
         # Prompt user to choose a key.
-        #progression = []
-        #intervals = []
-        
         if chosen_key == None:
-            print("Choose a key:")
-            notes_menu = TerminalMenu(self.notes) # Create the menu.
-            notes_index = notes_menu.show()
-            chosen_key = self.notes[notes_index] # Assign the value.
+            chosen_key = self.get_note_from_scale()
         
-        print("Key: " + str(self.notes[notes_index]))
+        print("Key: " + str(chosen_key))
         print()
 
         if intervals == None:
@@ -175,98 +235,6 @@ class musictools:
             print("")
             self.run()
 
-    def get_progression(self, chosen_key=None, intervals=None):
-        key_scale = []
-        for n in self.notes:
-            key_scale.append(n)
-
-        while key_scale[0] != chosen_key: 
-            key_scale.append(key_scale.pop(0))
-
-        progression = []
-
-        for interval in intervals:
-            moves = self.half_steps.get(interval) # Determine how many half-steps to move up the scale.
-            m = key_scale[moves]
-            if interval == "i" or interval == "ii" or interval == "iii" or interval == "iv" or interval == "v" or interval == "vi" or interval == "vii": # Add minor notation to minor intervals.
-                m = m + "m"
-            progression.append(m)
-
-        return progression
-
-    def get_notes_in_a_chord(self):
-        """
-        The user selects a chord & the chords type and we output the notes contained for it
-        """
-        cs_options = []
-        for cs in self.chromatic_scale:
-            cs_options.append(cs)
-        cs_menu = TerminalMenu(cs_options)
-        cs_index = cs_menu.show()
-        note = cs_options[cs_index]
-                
-        ct_options = []
-        for ct in self.chord_types:
-            ct_options.append(ct)
-        ct_menu = TerminalMenu(ct_options)
-        ct_index = ct_menu.show()
-        chord_t = ct_options[ct_index]
-        chord = note + chord_t
-        # Parse the chord string to extract the root note and chord type
-        root_note = chord[0]
-        chord_type = chord[1:]
-                
-        # Determine the intervals for the chord type
-        if chord_type not in self.chord_types:
-            print(f"Invalid chord type: {chord_type}")
-            return
-        intervals = self.chord_types[chord_type]
-                
-        # Calculate the notes in the chord
-        chord_notes = [self.chromatic_scale[(self.chromatic_scale.index(root_note) + interval) % 12] for interval in intervals]
-                
-        # Print the notes in the chord
-        print(f"The notes in {chord} chord are: {', '.join(chord_notes)}")  
-        print("")
-        self.run()   
-
-    def get_note_from_scale(self):
-        cs_options = []
-        for cs in self.chromatic_scale:
-            cs_options.append(cs)
-        cs_menu = TerminalMenu(cs_options)
-        cs_index = cs_menu.show()
-        note = cs_options[cs_index]
-
-        return note
-    
-    def get_chord_type(self):
-        ct_options = []
-        for ct in self.chord_types:
-            ct_options.append(ct)
-        ct_menu = TerminalMenu(ct_options)
-        ct_index = ct_menu.show()
-        chord_t = ct_options[ct_index]
-
-        return chord_t
-
-    def main(self):
-        self.run()
-        tool_options = []
-        tool_options.append("1. Get chords for common progressions with a given key")
-        tool_options.append("2. Create a custom progression with a given key")
-        tool_options.append("3. Get the notes in a chord")
-        tool_menu = TerminalMenu(tool_options)
-        tool_index = tool_menu.show()
-        tool = tool_options[tool_index]
-            
-        if tool[0] == '1':
-            self.get_chords_for_progression()
-        elif tool[0] == '2':
-            self.create_custom_progression()
-        else: 
-            self.get_notes_in_a_chord()
-
     def run(self):
         tool_options = []
         tool_options.append("1. Get chords for common progressions with a given key")
@@ -277,11 +245,11 @@ class musictools:
         tool = tool_options[tool_index]
     
         if tool[0] == '1':
-            self.get_chords_for_progression()
+            self.output_chords_for_progression()
         elif tool[0] == '2':
             self.create_custom_progression()
         else: 
-            self.get_notes_in_a_chord()   
+            self.output_notes_in_a_chord()
 
 if __name__ == '__main__':
     mt = musictools()
