@@ -114,6 +114,8 @@ class musictools:
 
         print("The chords in the key of " + chosen_key + " are: ")
         print(chords)
+        print("")
+        self.run()
 
     def create_custom_progression(self, chosen_key=None, intervals=None):
         """
@@ -153,13 +155,15 @@ class musictools:
                 hs_index = hs_menu.show()
                 prog = []
                 prog.append(hs_options[hs_index])
-                progression.append(prog)
+                progression.append(prog[0])
             
                 print("Interval added is: " + str(prog))
                 print(self.get_progression(chosen_key, prog))
 
-                intervals.append(self.get_progression(chosen_key, prog))
-    
+                new_prog = self.get_progression(chosen_key, prog)
+                for np in new_prog:
+                    intervals.append(np)
+                    
                 print("Progression: ")
                 print(progression)
                 print("Chords: ")
@@ -167,7 +171,9 @@ class musictools:
             
                 cont = input("Would you like to add another interval?")
                 if cont != "y" and cont != "Y":
-                    self.run()
+                    break
+            print("")
+            self.run()
 
     def get_progression(self, chosen_key=None, intervals=None):
         key_scale = []
@@ -220,7 +226,9 @@ class musictools:
         chord_notes = [self.chromatic_scale[(self.chromatic_scale.index(root_note) + interval) % 12] for interval in intervals]
                 
         # Print the notes in the chord
-        print(f"The notes in {chord} chord are: {', '.join(chord_notes)}")     
+        print(f"The notes in {chord} chord are: {', '.join(chord_notes)}")  
+        print("")
+        self.run()   
 
     def get_note_from_scale(self):
         cs_options = []
