@@ -136,6 +136,7 @@ class musictools:
         if intervals == None:
             key_scale = []
             progression = []
+            intervals = []
 
             for n in self.notes:
                 key_scale.append(n)
@@ -157,7 +158,7 @@ class musictools:
                 print("Interval added is: " + str(prog))
                 print(self.get_progression(chosen_key, prog))
 
-                intervals = self.get_progression(chosen_key, prog)
+                intervals.append(self.get_progression(chosen_key, prog))
     
                 print("Progression: ")
                 print(progression)
@@ -221,7 +222,6 @@ class musictools:
         # Print the notes in the chord
         print(f"The notes in {chord} chord are: {', '.join(chord_notes)}")     
 
-    
     def get_note_from_scale(self):
         cs_options = []
         for cs in self.chromatic_scale:
